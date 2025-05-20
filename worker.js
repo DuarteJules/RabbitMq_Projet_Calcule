@@ -6,6 +6,7 @@ dotenv.config({ path: "../.env" });
 const rabbitmq_url = `amqp://${process.env.LOGIN}:${process.env.PASSWORD}@${process.env.URL}`;
 const queue = `${process.argv[2]}_worker`;
 const exchange = "operations";
+const exchangeAll = "all_operations";
 const routing_key = process.argv[2];
 const results_queue = "results";
 let operation = {
@@ -30,6 +31,12 @@ async function receive() {
         autoDelete: false,
     });
 
+    //Création de l'exchange pour le all
+    await channel.assertExchange(exchangeAll, "fanout", {
+        durable: true,
+        autoDelete: false,
+    });
+
     // Assertions sur la queue du worker
     await channel.assertQueue(queue, { durable: true, autoDelete: false });
 
@@ -41,6 +48,9 @@ async function receive() {
 
     // Ajout de la règle de routing pour le worker
     await channel.bindQueue(queue, exchange, routing_key);
+
+    // Ajout de la queue sur l'exchange all
+    await channel.bindQueue(queue, exchangeAll, "");
 
     channel.consume(queue, (msg) => {
         if (msg !== null) {
