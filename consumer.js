@@ -1,41 +1,30 @@
-const amqplib = require('amqplib');
+import amqplib from 'amqplib';
+import dotenv from 'dotenv';
+dotenv.config({ path: '../.env' });
 
-const rabbitmq_url = 'amqp://'+process.env.USER+':'+process.env.PASSWORD+'@'+process.env.URL;
-const queue = 'AVG_project_calc_req';
-const message = 'Bonjour !' + Date.now();
+const rabbitmq_url = `amqp://${process.env.LOGIN}:${process.env.PASSWORD}@${process.env.URL}`;
+const queue = 'results';
 
-function createCalc(){
-    const nb1 = rand();
-    const nb2 = rand();
-    const req = {
-        "n1": nb1,
-        "n2": nb2
-    };
+const connection = await amqplib.connect(rabbitmq_url);
 
-    return req;
-}
-
-async function send() {
-    // Connexion
-    const connection = await amqplib.connect(rabbitmq_url);
-    
-    // Création du channel
+async function receive_results() {
     const channel = await connection.createChannel();
+    await channel.assertQueue(queue, { durable: true, autoDelete: false });
 
-    // Assertion sur l'existence de la queue
-    await channel.assertQueue(queue, { durable: false });
-
-    // Envoi du message
-    channel.sendToQueue(queue, Buffer.from(message));
-
-    console.log("Message envoyé !");
-
-    // Fermeture de la connexion
-    setTimeout(function() {
-        connection.close();
-        process.exit(0);
-    }, 200);
-
+    channel.consume(queue, (msg) => {
+        if (msg !== null) {
+            console.log("Message reçu : ", msg.content.toString());
+            const content = JSON.parse(msg.content.toString());
+            
+            // Afficher le résultat en fonction de l'opération
+            console.log(`Résultat reçu: ${content.n1} ${content.op} ${content.n2} = ${content.result}`);
+            
+            // Confirmer le message
+            channel.ack(msg);
+        }
+    });
+    
+    console.log(`En attente de résultats sur la queue "${queue}"...`);
 }
 
-send();
+receive_results();
