@@ -1,0 +1,92 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${LOGIN}
+      RABBITMQ_DEFAULT_PASS: ${PASSWORD}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  producer:
+    build:
+      context: .
+      dockerfile: producer/Dockerfile
+    restart: always
+    depends_on:
+      - rabbitmq
+    environment:
+      - AUTO_MODE=true
+      - URL=${URL}
+      - LOGIN=${LOGIN}
+      - PASSWORD=${PASSWORD}
+
+  consumer:
+    build:
+      context: .
+      dockerfile: consumer/Dockerfile
+    restart: always
+    depends_on:
+      - rabbitmq
+    environment:
+      - URL=${URL}
+      - LOGIN=${LOGIN}
+      - PASSWORD=${PASSWORD}
+
+  worker_add:
+    build:
+      context: .
+      dockerfile: worker/Dockerfile
+    restart: always
+    depends_on:
+      - rabbitmq
+    environment:
+      - URL=${URL}
+      - LOGIN=${LOGIN}
+      - PASSWORD=${PASSWORD}
+      - OPERATION=add
+
+  worker_sub:
+    build:
+      context: .
+      dockerfile: worker/Dockerfile
+    restart: always
+    depends_on:
+      - rabbitmq
+    environment:
+      - URL=${URL}
+      - LOGIN=${LOGIN}
+      - PASSWORD=${PASSWORD}
+      - OPERATION=sub
+
+  worker_mul:
+    build:
+      context: .
+      dockerfile: worker/Dockerfile
+    restart: always
+    depends_on:
+      - rabbitmq
+    environment:
+      - URL=${URL}
+      - LOGIN=${LOGIN}
+      - PASSWORD=${PASSWORD}
+      - OPERATION=mul
+
+  worker_div:
+    build:
+      context: .
+      dockerfile: worker/Dockerfile
+    restart: always
+    depends_on:
+      - rabbitmq
+    environment:
+      - URL=${URL}
+      - LOGIN=${LOGIN}
+      - PASSWORD=${PASSWORD}
+      - OPERATION=div
+
+volumes:
+  rabbitmq_data:
