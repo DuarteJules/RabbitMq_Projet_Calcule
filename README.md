@@ -45,3 +45,4 @@ Identifiants par défaut :
 - **Utilisateur :** guest  
 - **Mot de passe :** guest
 
+## 6. Fonctionnement du projet
