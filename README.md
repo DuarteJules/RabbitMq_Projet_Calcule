@@ -16,23 +16,16 @@ https://www.rabbitmq.com/install-windows.html
 ## 3. Activer le plugin management
 
 Ouvrez un terminal **(cmd ou PowerShell en administrateur)** et exécutez :
-
+```bash
 rabbitmq-plugins enable rabbitmq_management
-
-shell
-Copier
-Modifier
+```
 
 ## 4. Démarrer RabbitMQ
 
 Dans le terminal, lancez :
-
+```bash
 rabbitmq-server
-
-yaml
-Copier
-Modifier
-
+```
 *Ou démarrez le service `RabbitMQ` via l’outil « Services » de Windows.*
 
 ## 5. Accéder à l’interface web
