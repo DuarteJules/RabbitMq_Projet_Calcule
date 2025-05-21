@@ -28,6 +28,14 @@ rabbitmq-server
 ```
 *Ou démarrez le service `RabbitMQ` via l’outil « Services » de Windows.*
 
+Il est possible que vous ayez une erreur de ce style lorsque vous venez d'installer RabbitMQ
+`2025-05-20 10:38:07.026000+02:00 [notice] <0.45.0> Application rabbitmq_prelaunch exited with reason: {{shutdown,{failed_to_start_child,prelaunch,{dist_port_already_used,25672,"rabbit","Thomas"}}},{rabbit_prelaunch_app,start,[normal,[]]}}`
+
+Il vous suffira de taper la commande suivante qui va se charger de couper le service rabbit qui fonctionne déjà:
+```bash
+rabbitmq-service stop
+```
+
 ## 5. Accéder à l’interface web
 
 Ouvrez votre navigateur à l’adresse :  
